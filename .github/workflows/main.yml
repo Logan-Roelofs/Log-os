@@ -46,6 +46,8 @@ jobs:
     - name: Import Script / Dot Files
       run: |
         echo "Importing Script and Dot Files..."
+        pwd
+        ls -la
         sudo cp logos.sh squashfs-root/root/logos.sh && \
         sudo chmod +x squashfs-root/root/logos.sh && \
         sudo cp VBoxLinuxAdditions.run squashfs-root/root/VBoxLinuxAdditions.run && \
