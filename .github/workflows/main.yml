@@ -69,24 +69,24 @@ jobs:
         xorriso -as mkisofs -r -V "logos custom amd64" -o logos-custom-amd64.iso -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin iso/boot iso
         sudo rm -r iso
 
-# - name: Create Release
-#   id: create_release
-#   uses: actions/create-release@v1
-#   env:
-#     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#   with:
-#     tag_name: ${{ github.ref }}
-#     release_name: Release ${{ github.ref }}
-#     draft: false
-#     prerelease: false
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false
 
-# - name: Upload Release Asset
-#   id: upload-release-asset 
-#   uses: actions/upload-release-asset@v1
-#   env:
-#     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#   with:
-#     upload_url: ${{ steps.create_release.outputs.upload_url }} # This will fail with `act`
-#     asset_path: ./logos-custom-amd64.iso
-#     asset_name: logos-custom-amd64.iso
-#     asset_content_type: application/x-iso9660-image
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This will fail with `act`
+        asset_path: ./logos-custom-amd64.iso
+        asset_name: logos-custom-amd64.iso
+        asset_content_type: application/x-iso9660-image
