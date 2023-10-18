@@ -1,0 +1,92 @@
+name: Build Custom Debian ISO
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Install Tools
+      run: |
+        echo "Installing Tools..."
+        sudo apt-get update
+        sudo apt-get install -y fakeroot syslinux-efi xorriso debootstrap squashfs-tools genisoimage syslinux syslinux-utils isolinux
+
+    - name: Download ISO Images
+      run: |
+        echo "Downloading ISO Images..."
+        curl https://gemmei.ftp.acc.umu.se/debian-cd/current-live/amd64/iso-hybrid/debian-live-12.2.0-amd64-standard.iso --output debian-live-12.2.0-amd64-standard.iso
+        latest_version=$(curl -s https://download.virtualbox.org/virtualbox/LATEST.TXT)
+        curl https://download.virtualbox.org/virtualbox/${latest_version}/VBoxGuestAdditions_${latest_version}.iso --output VBoxGuestAdditions_latest.iso
+
+    - name: Unpack ISO File
+      run: |
+        echo "Unpacking ISO Files..."
+        xorriso -osirrox on -indev debian-live-12.2.0-amd64-standard.iso -extract / iso && chmod -R +w iso
+        xorriso -osirrox on -indev VBoxGuestAdditions_latest.iso -extract / vbox && chmod -R +w iso
+        cp vbox/VBoxLinuxAdditions.run .
+        sudo rm -r vbox/ VBoxGuestAdditions_latest.iso
+
+    - name: Unpack File System
+      run: |
+        echo "Unpacking File System..."
+        sudo unsquashfs iso/live/filesystem.squashfs
+
+    - name: Import Script / Dot Files
+      run: |
+        echo "Importing Script and Dot Files..."
+        sudo cp logos.sh squashfs-root/root/logos.sh && \
+        sudo chmod +x squashfs-root/root/logos.sh && \
+        sudo cp VBoxLinuxAdditions.run squashfs-root/root/VBoxLinuxAdditions.run && \
+        sudo chmod +x squashfs-root/root/VBoxLinuxAdditions.run && \
+        sudo rm VBoxLinuxAdditions.run && \
+        sudo mkdir -p squashfs-root/etc/skel/.config && \
+        sudo mkdir -p squashfs-root/etc/skel/.themes/mythemes/gnome-shell && \
+        sudo cp .config/tilix.dconf squashfs-root/etc/skel/.config/tilix.dconf && \
+        sudo cp .themes/mythemes/gnome-shell/gnome-shell.css squashfs-root/etc/skel/.themes/mythemes/gnome-shell/gnome-shell.css && \
+        sudo mkdir -p squashfs-root/usr/share/gnome-shell/theme/ && \
+        sudo cp .themes/mythemes/gnome-shell/gnome-shell.css squashfs-root/usr/share/gnome-shell/theme/gnome-shell.css
+
+    - name: Run logos.sh script
+      run: |
+        echo "Running logos.sh script..."
+        sudo chroot squashfs-root/ /bin/bash -c "/root/logos.sh; exit"
+
+    - name: Repack File System
+      run: |
+        echo "Repacking File System..."
+        sudo mksquashfs squashfs-root/ iso/live/filesystem.squashfs -comp xz -b 1M -noappend
+        sudo rm -r squashfs-root/
+
+    - name: Make ISO
+      run: |
+        echo "Creating ISO..."
+        xorriso -as mkisofs -r -V "logos custom amd64" -o logos-custom-amd64.iso -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin iso/boot iso
+        sudo rm -r iso
+
+# - name: Create Release
+#   id: create_release
+#   uses: actions/create-release@v1
+#   env:
+#     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#   with:
+#     tag_name: ${{ github.ref }}
+#     release_name: Release ${{ github.ref }}
+#     draft: false
+#     prerelease: false
+
+# - name: Upload Release Asset
+#   id: upload-release-asset 
+#   uses: actions/upload-release-asset@v1
+#   env:
+#     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#   with:
+#     upload_url: ${{ steps.create_release.outputs.upload_url }} # This will fail with `act`
+#     asset_path: ./logos-custom-amd64.iso
+#     asset_name: logos-custom-amd64.iso
+#     asset_content_type: application/x-iso9660-image
