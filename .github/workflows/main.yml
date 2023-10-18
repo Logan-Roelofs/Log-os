@@ -21,7 +21,7 @@ jobs:
       run: |
         echo "Installing Tools..."
         sudo apt-get update
-        sudo apt-get install -y fakeroot syslinux-efi xorriso debootstrap squashfs-tools genisoimage syslinux syslinux-utils isolinux
+        sudo apt-get install -y fakeroot syslinux-efi xorriso debootstrap squashfs-tools genisoimage syslinux syslinux-utils isolinux p7zip-full
 
     - name: Download ISO Images
       run: |
@@ -74,7 +74,7 @@ jobs:
         echo "Creating ISO..."
         xorriso -as mkisofs -r -V "logos custom amd64" -o logos-custom-amd64.iso -J -l -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -eltorito-alt-boot -e boot/grub/efi.img -no-emul-boot -isohybrid-gpt-basdat -isohybrid-apm-hfsplus -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin iso/boot iso
         sudo rm -r iso
-      
+        du -sh ./logos-custom-amd64.iso
 
     - name: Create Release
       id: create_release

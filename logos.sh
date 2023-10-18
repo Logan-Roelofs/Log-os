@@ -9,7 +9,7 @@ sed -i '$d' /etc/apt/sources.list
 apt-get update
 
 # Install the packages
-apt-get install -y gnome-shell tldr neofetch tilix gnome-shell-extension-manager 
+apt-get install -y gnome-shell tilix
 
 # Change defualt theming 
 echo '#!/bin/bash\n\n# Change Gnome settings\ngsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'' > /etc/skel/gnome-settings.sh
@@ -30,15 +30,16 @@ curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-
 #       Add Brave to the APT repositories
 echo "deb [signed-by=/usr/share/keyrings/brave-browser-archive-keyring.gpg] https://brave-browser-apt-release.s3.brave.com/ stable main" > /etc/apt/sources.list.d/brave-browser-release.list
 #       Update the package list
-apt-get update
+#apt-get update
 #       Install the Brave browser
-apt-get install -y brave-browser
+#apt-get install -y brave-browser
 
 # Add Spotify's signing key
 curl -sS https://download.spotify.com/debian/pubkey_7A3A762FAFD4A51F.gpg | gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
 #       Add Spotify to the APT repositories
 echo "deb http://repository.spotify.com stable non-free" > /etc/apt/sources.list.d/spotify.list
 #       Update the package list
-apt-get update
+#apt-get update
 #       Install the Spotify client
-apt-get install -y spotify-client
+#apt-get install -y spotify-client
+apt-get clean
