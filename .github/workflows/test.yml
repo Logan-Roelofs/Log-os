@@ -17,6 +17,9 @@ jobs:
         id: get_version
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
+      - name: Create test.txt
+        run: echo "This is a test file" > test.txt
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
