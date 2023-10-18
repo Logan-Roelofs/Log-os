@@ -12,12 +12,12 @@ apt-get update
 apt-get install -y gnome-shell tilix
 
 # Change defualt theming 
-echo '#!/bin/bash\n\n# Change Gnome settings\ngsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'' > /etc/skel/gnome-settings.sh
+echo -e '#!/bin/bash\n\n# Change Gnome settings\ngsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'' > /etc/skel/gnome-settings.sh
 chmod +x /etc/skel/gnome-settings.sh
 echo "/etc/skel/gnome-settings.sh" >> /etc/skel/.profile
 
 # Create a script that loads Tilix settings
-echo '#!/bin/bash\n\n# Load Tilix settings\ndconf load /com/gexperts/Tilix/ < /etc/skel/.config/tilix.dconf' > /etc/skel/tilix-settings.sh
+echo -e '#!/bin/bash\n\n# Load Tilix settings\ndconf load /com/gexperts/Tilix/ < /etc/skel/.config/tilix.dconf' > /etc/skel/tilix-settings.sh
 # Make the script executable
 chmod +x /etc/skel/tilix-settings.sh
 # Add the script to the .profile file to be executed at login

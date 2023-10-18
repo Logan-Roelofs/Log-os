@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Load Tilix settings
+dconf load /com/gexperts/Tilix/ < /etc/skel/.config/tilix.dconf
